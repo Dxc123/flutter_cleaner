@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 void main(List<String> args) async {
-  print('Scanning current directory for Flutter projects...');
+  logInfo('Scanning current directory for Flutter projects...');
 
   final currentDir = Directory.current;
 
@@ -10,16 +10,16 @@ void main(List<String> args) async {
   final flutterProjects = await _findFlutterProjects(currentDir);
 
   if (flutterProjects.isEmpty) {
-    print('No Flutter projects found in the current directory.');
+    logWarning('No Flutter projects found in the current directory.');
     return;
   }
 
-  print('\nFound ${flutterProjects.length} Flutter project(s). Starting cleaning...');
+  logInfo('\nFound ${flutterProjects.length} Flutter project(s). Starting cleaning...');
 
   // 并发清理所有项目
   await Future.wait(flutterProjects.map((project) => _cleanProjectAsync(project)));
 
-  print('\nAll Flutter projects cleaned!');
+  logSuccess('\nAll Flutter projects cleaned successfully!');
 }
 
 /// 异步扫描目录中的所有 Flutter 项目
@@ -43,7 +43,7 @@ bool _isFlutterProject(Directory dir) {
 
 /// 异步清理 Flutter 项目
 Future<void> _cleanProjectAsync(Directory dir) async {
-  print('\nCleaning project: ${dir.path}');
+  logInfo('\nCleaning project: ${dir.path}');
 
   // 并发执行清理任务
   await Future.wait([
@@ -52,12 +52,12 @@ Future<void> _cleanProjectAsync(Directory dir) async {
     _deleteBuildAsync(dir),
   ]);
 
-  print('Project ${dir.path} cleaned successfully.');
+  logSuccess('Project ${dir.path} cleaned successfully.');
 }
 
 /// 异步执行 flutter clean
 Future<void> _runFlutterCleanAsync(Directory dir) async {
-  print('Running flutter clean in ${dir.path}...');
+  logInfo('Running flutter clean in ${dir.path}...');
   final flutterCommand = 'flutter';
   final processResult = await Process.run(
     flutterCommand,
@@ -66,9 +66,9 @@ Future<void> _runFlutterCleanAsync(Directory dir) async {
   );
 
   if (processResult.exitCode == 0) {
-    print('flutter clean completed for ${dir.path}.');
+    logSuccess('flutter clean completed for ${dir.path}.');
   } else {
-    print('Failed to run flutter clean for ${dir.path}. Error: ${processResult.stderr}');
+    logError('Failed to run flutter clean for ${dir.path}. Error: ${processResult.stderr}');
   }
 }
 
@@ -76,9 +76,11 @@ Future<void> _runFlutterCleanAsync(Directory dir) async {
 Future<void> _deleteCacheAsync(Directory dir) async {
   final cacheDir = Directory('${dir.path}/.dart_tool');
   if (await cacheDir.exists()) {
-    print('Deleting cache folder: ${cacheDir.path}');
+    logInfo('Deleting cache folder: ${cacheDir.path}');
     await cacheDir.delete(recursive: true);
-    print('Cache folder deleted.');
+    logSuccess('Cache folder deleted.');
+  } else {
+    logWarning('Cache folder not found: ${cacheDir.path}');
   }
 }
 
@@ -86,8 +88,27 @@ Future<void> _deleteCacheAsync(Directory dir) async {
 Future<void> _deleteBuildAsync(Directory dir) async {
   final buildDir = Directory('${dir.path}/build');
   if (await buildDir.exists()) {
-    print('Deleting build folder: ${buildDir.path}');
+    logInfo('Deleting build folder: ${buildDir.path}');
     await buildDir.delete(recursive: true);
-    print('Build folder deleted.');
+    logSuccess('Build folder deleted.');
+  } else {
+    logWarning('Build folder not found: ${buildDir.path}');
   }
+}
+
+/// 日志输出工具（带颜色）
+void logInfo(String message) {
+  print('\x1B[34m[INFO] $message\x1B[0m'); // 蓝色
+}
+
+void logSuccess(String message) {
+  print('\x1B[32m[SUCCESS] $message\x1B[0m'); // 绿色
+}
+
+void logWarning(String message) {
+  print('\x1B[33m[WARNING] $message\x1B[0m'); // 黄色
+}
+
+void logError(String message) {
+  print('\x1B[31m[ERROR] $message\x1B[0m'); // 红色
 }
