@@ -5,3 +5,10 @@
 删除 .dart_tool 文件夹。
 
 删除 build 文件夹。
+
+
+使用：
+安装到本地：(需要Flutter环境)
+dart pub global activate -sgit https://github.com/Dxc123/flutter_cleaner.git
+
+执行命令：flutter_cleaner clean
