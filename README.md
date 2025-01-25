@@ -15,4 +15,6 @@
 
 dart pub global activate -sgit https://github.com/Dxc123/flutter_cleaner.git
 
+本地移除：dart pub global deactivate flutter_cleaner
+
 执行命令：flutter_cleaner clean
