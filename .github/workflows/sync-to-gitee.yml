@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: 检出 GitHub 代码
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 取消 shallow clone
 
       - name: 推送代码到 Gitee
         run: |
