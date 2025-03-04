@@ -1,0 +1,28 @@
+name: Sync to Gitee
+
+on:
+  push:
+    branches:
+      - main  # 监听 main 分支推送
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 检出 GitHub 代码
+        uses: actions/checkout@v4
+
+      - name: 推送代码到 Gitee
+        run: |
+          git config --global user.email "daixingchuang@163.com"
+          git config --global user.name "dxc_123"
+          
+          # Gitee 仓库地址，使用 Token 认证
+          git remote add gitee https://oauth2:$GITEE_TOKEN@gitee.com/dxc_123/flutter_cleaner.git
+          
+          # 推送代码
+          git push -f gitee master
+        env:
+          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+
