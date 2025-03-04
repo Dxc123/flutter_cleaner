@@ -22,7 +22,7 @@ jobs:
           git remote add gitee https://oauth2:$GITEE_TOKEN@gitee.com/dxc_123/flutter_cleaner.git
           
           # 推送代码
-          git push -f gitee master
+          git push -f gitee main
         env:
           GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
 
